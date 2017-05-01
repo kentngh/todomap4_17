@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html ng-app="toDoApp">
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+    <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script>
+      $(document).ready(function(){
+          $("#left").click(function(){
+              $("#left1").toggle(500);
+              $("#left2").toggle(500,function(){
+                google.maps.event.trigger(map, 'resize');
+              });
+          });
+          $("#right").click(function(){
+              $("#right1").toggle(500);
+              $("#right2").toggle(500,function(){
+                google.maps.event.trigger(map, 'resize');
+              });
+              $("#right3").toggle(500);
+              
+          });
+          $("#left1").hide();
+          $("#left2").hide();
+          $("#right1").hide();
+          $("#right2").hide();
+          $("#right3").hide();
+    });
+    </script>
+    <style>
+      #map-canvas {display: block; height: 350px; width: 500px;}
+      td { 
+        padding: 5px;
+      }
+      h1, strong {
+        color: #265a88;
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+     <script type="text/javascript">
+				var map = null;
+				var datacenterMap = null;
+				var activeMarker = null;
+				var lastLatLng = null;
+				var activeInfowindow = null;
+				var cluster = null;
+    </script>
+    
+    <script src="toDoApp.js"></script>
+
+  </head>
+
+  <body ng-controller="mainController">
+  <div class="container">
+
+  <table align="center" style="width:95%">
+
+    <col width="20%">
+    <col width="50%">
+    <col width="50%">
+
+    <tr> <!-- Headers -->
+      <td id="left1"><div class="text-center"><h1>Database</h1></div></td>
+      <td><div class="text-center"><h1>To Do List</h1></div></td> 
+      <td id="right1"><div class="text-center"><h1><a href="servers.html" target="_blank">{{cluster}} Cluster</a></h1></div></td>
+    </tr>
+
+    <tr> <!-- Body -->
+      <td id="left2" valign="top">
+
+        <p><strong>Current</strong></p>
+
+        <table align="left" style="width:95%">
+          <tr><td><small>Type</td></small><td><small>{{dbInfo.type}}</small></td></tr>
+          <tr><td><small>User</td></small><td><small>{{dbInfo.user}}</small></td></tr>
+          <tr><td><small>Password</td></small><td><small>{{dbInfo.password}}</small></td></tr>
+          <tr><td><small>Host</td></small><td><small>{{dbInfo.host}}</small></td></tr>
+          <tr><td><small>Port</td></small><td><small>{{dbInfo.port}}</small></td></tr>
+          <tr><td><small>Database</td></small><td><small>{{dbInfo.database}}</small></td>
+       </table>
+
+        <p><strong>New</strong></p>
+        <div id="db-form">
+            <div>
+                <form>
+                    <select class="form-control" ng-model="db.type">
+                        <option value="memory">Memory</option>
+                        <option value="mongo">Mongo</option>
+                        <option value="postgres">Postgres</option>
+                        <option value="mysql">MySql</option>
+                    </select>
+                    <div >
+                        <input type="text" class="form-control input-sm text-center" placeholder="user" ng-model="db.user">
+                    </div>
+                    <div >
+                        <input type="text" class="form-control input-sm text-center" placeholder="password" ng-model="db.password">
+                    </div>
+                    <div >
+                        <input type="text" class="form-control input-sm text-center" placeholder="host" ng-model="db.host">
+                    </div>
+                    <div >
+                        <input type="text" class="form-control input-sm text-center" placeholder="port" ng-model="db.port">
+                    </div>
+                    <div >
+                        <input type="text" class="form-control input-sm text-center" placeholder="database" ng-model="db.database">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm" ng-click="populateCurrent()">Populate</button>
+                    <button type="submit" class="btn btn-primary btn-sm" ng-click="connectDb()">Connect</button>
+                    <button type="submit" class="btn btn-primary btn-sm" ng-click="resetDb()">Reset</button>
+                            <div ng-show="lastDbApply.error" class="alert alert-danger" role="alert">
+                              Error connecting {{lastDbApply.error.code}}
+                            </div>
+                </form>
+            </div>
+        </div>
+      </td>
+
+      <td align="center" valign="top">    
+        <span class="badge">{{ todos.length }}</span>
+      <button type="submit" class="btn btn-primary btn-sm" ng-click="refreshToDo()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
+          <table style="width:100%">
+            <tr>
+              <td><button id="left"><span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span></button></td>
+              <td align="right"><button id="right"><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></button></td>
+            </tr>
+          </table>
+
+          
+            <div class="checkbox" ng-repeat="todo in todos">
+              <label><input type="checkbox" ng-click="deleteTodo(todo.title)">{{ todo.title }}</label>
+            </div>
+            <div id="todo-form" class="row">
+              <div class="col-sm-8 col-sm-offset-2 text-center">
+                  <form>
+                        <div class="form-group">
+                            <input type="text" class="form-control input-sm text-center" placeholder="Type a new To Do" ng-model="formData.text">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm" ng-click="createTodo()">Add</button>
+						<br>
+						<hr>
+						<code>User: {{currentInfo.user}}</code><br>
+						<code>Pass: {{currentInfo.password}}</code><br>
+                  </form>
+              </div>
+            </div>
+            <div ng-show="dbInfo.type=='Memory'" class="alert alert-warning" role="alert">
+              No database. Items will not be persisted.
+            </div>
+            <div ng-show="error" class="alert alert-danger" role="alert">
+              Operation not performed - code: {{error.code}} - hint: {{error.hint}}
+            </div>
+       
+      
+      </td> 
+        <td id="right2">
+          <div style="width:100%" id="map-canvas"></div>
+            <table align="centre" style="width:200">
+              <tr><td><strong>Last API Call</strong></td></tr>
+              <tr><td><small>App Name</small></td><td><small>{{provider.appName}}</small></td></tr>
+              <tr><td><small>Namespace</small></td><td><small>{{provider.namespace}}</small></td></tr>
+              <tr><td><small>Instance</small></td><td><small>{{provider.appInstance}}</small></td></tr>
+              <tr><td><small>IP Address</small></td><td><small>{{provider.ipAddress}}</small></td></tr>
+              <tr><td><small>Cloud</small></td><td><small>{{provider.cloud}}</small></td></tr>
+              <tr><td><small>Region</small></td><td><small>{{provider.region}}</small></td></tr>              
+            </table>
+			<!-- This doesn't work as desired -->
+            <!-- <button type="submit" class="btn btn-primary btn-sm" ng-click="killServer()">Kill</button> -->
+        </td>
+      </tr>
+
+  </table>
+  </div>
+  </body>
+</html>

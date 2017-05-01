@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html ng-app="todoDatacenters">
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <style>
+      #datacenter-canvas {display: block; height: 800px; width: 1500px;}
+      td { 
+        padding: 5px;
+      }
+      h1, strong {
+        color: #265a88;
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+     <script type="text/javascript">
+		    var map = null;
+		    var datacenterMap = null;
+        var lastLatLng = null;
+    </script>
+    
+    <script src="servers.js"></script>
+
+  </head>
+
+  <body ng-controller="mainController">
+  <div class="container">
+
+  <table align="center" style="width:100%">
+	<tr> <!-- Body -->
+		<td id="right2">
+			<div style="width:100%" id="datacenter-canvas"></div>
+		</td>
+	</tr>
+  </table>
+  </div>
+  </body>
+</html>
